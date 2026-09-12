@@ -1,17 +1,18 @@
 # Social Sim Game Project
 # Antonio Ochoa, Joseph Endozo
+# for json: item template
+# {
+#   "Name":
+#   "Description":
+# }
+import json
 
 class Character:
     """Parent class designed to hold the traits of a character
     in the game"""
     def __init__(
         self, 
-        traits = {
-            "Name": "",
-            "Hair Color": "",
-            "Blood Type": "",
-            "Preferred Compliment": ""
-        }
+        traits
     ):
         self.traits = traits
 
@@ -54,30 +55,38 @@ class Player(Character):
     gift items in and access during the beginning of the day"""
     def __init__(
         self, 
-        playerTraits, 
+        playerTraits = {
+            "Name": "",
+            "Hair Color": "",
+            "Eye Color": "",
+            "Blood Type": "",
+            "Preferred Compliment": ""
+        }, 
         inventory=Inventory(), 
         energy = 0
     ):
         super().__init__(playerTraits)
         self.inventory = inventory
         self.energy = energy
-    '''
-    def giveItem(self):
-        response = input("Which item would you like to gift?: ")
-        if response in self.inventory:
-            self.inventory.pop(response)
-            return respons
-            e
-        else:
-            print("You don't have that!")
-    '''
+
+    def checkStats(self):
+        for key, value in self.traits.items():
+            print(f"{key}: {value}")
+        print(f"Current energy: {self.energy}")
 
 class NPC(Character):
     """Child class of parent, represents a non-player
     character that the player can interact with. Contains
     preferences for items they like and dislike, as well as
     an attachment score that influences the win condition"""
-    def __init__(self, npcName, preferences = {"likes": [], "dislikes": []}):
+    def __init__(
+        self, 
+        npcTraits = {
+            "Name": "",
+            "Hair Color": "",
+            "Blood Type": "",
+        }, 
+        preferences = {"likes": [], "dislikes": []}):
         super().__init__(npcName, attachment=0)
         self.preferences = preferences
         self.attachment = 0
@@ -94,7 +103,7 @@ class NPC(Character):
     '''       
 
 def getPlayerInfo():
-    infoHold = Character()
+    infoHold = Player()
     confirm = ""
     while confirm != "Yes" and confirm != "yes":
         for key in infoHold.traits.keys():
@@ -105,41 +114,33 @@ def getPlayerInfo():
         confirm = input("is this okay?: ")
     return infoHold
 
-def checkPlayerStats():
-    chungs = 5
-
-def main():
+def testBlock():
+    filename = "charFiles/gameItems.json"
+    itemList = []
+    with open(filename) as file:
+        itemList = json.load(file)
     
-    mainCharacter = Player(getPlayerInfo())
-    # print(len(mainCharacter.inventory))
+    mainCharacter = getPlayerInfo()
     mainCharacter.inventory.open()
-
-    giftItem = {
-        "Name": "Apple",
-        "Description": "A succulent, yet healthy snack. A favorite of those who take their nutrition seriously!"
-    }
-
-    giftItemTwo = {
-        "Name": "Masamune",
-        "Description": "A legendary holy sword used to fell a dark mage in 600 A.D. Smells a bit like a swamp..."
-    }
-    mainCharacter.inventory.addItem(giftItem)
-    mainCharacter.inventory.addItem(giftItemTwo)
     
+    for item in itemList:
+        mainCharacter.inventory.addItem(item)
     mainCharacter.inventory.open()
     while(mainCharacter.inventory.isOpen()):
         try:
             action = int(input(
-                "What would you like to do?\n1) close\n2) read item description\n(type the number of the action you want to perform):"))
+                "What would you like to do?\n1) close\n2) read item description\n3) check stats\n(type the number of the action you want to perform):"))
             if action == 1:
                 mainCharacter.inventory.close()
             elif action == 2:
                 selectedItem = input("Which item would you like to see the description of?\n(type the name of the item):")
                 print(mainCharacter.inventory.readItemDesc(selectedItem))
+            elif action == 3:
+                mainCharacter.checkStats()
             else:
                 print("That's not an option!")
         except ValueError:
              print("That's not an option!")
 
-main()
+testBlock()
 
