@@ -1,0 +1,18 @@
+[
+	{
+		"Name": "Apple",
+		"Description": "A succulent, yet healthy snack. A favorite of those who take their nutrition seriously!"	
+	},
+	{
+		"Name": "Masamune",
+		"Description": "The legendary holy sword used to fell a dark mage in 600 A.D. Smells a bit like a swamp..."
+	},
+	{
+		"Name": "B-Fold",
+		"Description": "A refurbished model of the latest foldable from B-Nana. Sounds a bit too crunchy when you fold it..."
+	},
+	{
+		"Name": "Jack of Acorns",
+		"Description": "A playing card from a German deck. A bit torn, but the amber accents still have their sheen."
+	}
+]
