@@ -84,15 +84,16 @@ def saveGame():
 
 #Loading saves
 def loadSave():
+    #Reads the file data from the saves file, then replaces the saves dictionary with that data
     filename = 'saves_file'
     with open(filename) as f:
         saves = json.load(f)
     print("Please choose which save you would like to load")
+    #Shows the saves and allows the user to pick which one to overwrite their data with
     for number in id_list
         print(id_list[number])
     loadSaveResponse = input()
     achievementDict = saves[loadSaveResponse]
-                           
 
 def newGame():
     print("new works")
