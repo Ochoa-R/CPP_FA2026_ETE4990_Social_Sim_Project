@@ -2,8 +2,8 @@
 # Antonio Ochoa, Joseph Endozo
 # for json: item template
 # {
-#   "Name":
-#   "Description":
+#   "Name": "",
+#   "Description": ""
 # }
 import json
 
@@ -24,10 +24,16 @@ class Inventory:
     def __init__(self, inventory = [], invState = False):
         self.__inventory = inventory
         self.__invState = invState
-
+    
+    @property
+    def inventory(self):
+        """Return the player's current inventory"""
+        return self.__inventory
     def isOpen(self):
+        """Return whether or not the inventory is currently open"""
         return self.__invState
     def open(self):
+        """Open the player's inventory. Used to support menu logic"""
         if len(self.__inventory) == 0:
             print("Inventory empty!\n")
         else:
@@ -37,17 +43,31 @@ class Inventory:
                 count += 1
             self.__invState = True
     def close(self):
+        """Close the player's inventory. Used to support menu logic"""
         self.__invState = False 
+    def checkForItem(self, name):
+        """checks whether a given item exists in the player's current inventory.
+        Used for error handling before returning or editing inventory values."""
+        for item in self.__inventory:
+            if name in item.values():
+                return item
+        else:
+            return False
     def addItem(self, item):
+        """Adds an item to the player's inventory"""
         self.__inventory.append(item)
     def readItemName(self, item):
+        """Returns the name of an item in the player's inventory"""
         return item["Name"]
     def readItemDesc(self, selectedItem):
-        for item in self.__inventory:
-            if item["Name"] == selectedItem:
-                    return item["Description"]
+        """Returns the description of a chosen item in the player's inventory,
+        if it exists. Otherwise, states that the player does not have that
+        item."""
+        '''
+        if self.__inventory.checkForItem(selectedItem):
         else:
             return "You don't have that!"
+        '''
 
 class Player(Character):
     """Child class of parent, represents the user's player
@@ -74,6 +94,9 @@ class Player(Character):
             print(f"{key}: {value}")
         print(f"Current energy: {self.energy}")
 
+    def giveGift(self, item):
+        gift = {}
+
 class NPC(Character):
     """Child class of parent, represents a non-player
     character that the player can interact with. Contains
@@ -84,23 +107,27 @@ class NPC(Character):
         npcTraits = {
             "Name": "",
             "Hair Color": "",
-            "Blood Type": "",
+            "Eye Color": "",
+            "Blood Type": ""
         }, 
-        preferences = {"likes": [], "dislikes": []}):
-        super().__init__(npcName, attachment=0)
+        preferences = {
+            "likes": [], 
+            "dislikes": []
+        }
+    ):
+        super().__init__(npcTraits)
         self.preferences = preferences
         self.attachment = 0
-    '''
+        
     def receiveGift(self, gift):
-        if gift in self.preferences["likes"]:
+        if gift["Name"] in self.preferences["likes"]:
             print(f"{self.name} likes your gift!")
             self.attachment += 10
-        elif gift in self.preferences["dislikes"]:
+        elif gift["Name"] in self.preferences["dislikes"]:
             print(f"{self.name} didn't like your gift...")
             self.attachment -= 10
         else:
-            pirint(f"{self.name} appreciated the thought.")
-    '''       
+            print(f"{self.name} appreciated the thought.")     
 
 def getPlayerInfo():
     infoHold = Player()
@@ -114,17 +141,54 @@ def getPlayerInfo():
         confirm = input("is this okay?: ")
     return infoHold
 
+def loadNPCInfo():
+    npcFile = "charFiles/npcs.json"
+    loadedNPC = NPC()
+    with open(npcFile) as file:
+        npcData = json.load(file)
+        loadedNPC.traits = npcData[0]
+        loadedNPC.preferences
+
+def loadPlayerInfo():
+    playerFile = "charFiles/charSave.json"
+    loadedPlayer = Player()
+        
+
+def displayOptions(**options):
+    for optionNumber, optionDesc in options:
+        print(f"{optionNumber}) {optionDesc["action"]}")
+
 def testBlock():
-    filename = "charFiles/gameItems.json"
+    itemFile = "charFiles/gameItems.json"
     itemList = []
-    with open(filename) as file:
+    with open(itemFile) as file:
         itemList = json.load(file)
     
     mainCharacter = getPlayerInfo()
-    mainCharacter.inventory.open()
-    
     for item in itemList:
         mainCharacter.inventory.addItem(item)
+
+    testItem = "Apple"
+    if mainCharacter.inventory.checkForItem(testItem):
+        print("You have that item")
+    else:
+        print("You don't have that item")
+
+    testItem = "Banana"
+    if mainCharacter.inventory.checkForItem(testItem):
+        print("You have that item")
+    else:
+        print("You don't have that item")
+
+    with open("charFiles/charSave.json", "w") as file:
+        playerData = {
+            "traits": mainCharacter.traits,
+            "inventory": mainCharacter.inventory.inventory,
+            "energy": mainCharacter.energy
+        }
+        json.dump(playerData, file)
+   
+    '''
     mainCharacter.inventory.open()
     while(mainCharacter.inventory.isOpen()):
         try:
@@ -141,6 +205,6 @@ def testBlock():
                 print("That's not an option!")
         except ValueError:
              print("That's not an option!")
+     '''
 
 testBlock()
-
