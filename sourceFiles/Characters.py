@@ -52,6 +52,7 @@ class Inventory:
         """checks whether a given item exists in the player's current inventory.
         Used for error handling before returning or editing inventory values."""
         for item in self.__inventory:
+            # print(item.values())
             if name in item.values():
                 return item
         else:
@@ -66,7 +67,7 @@ class Inventory:
         """Returns the description of a chosen item in the player's inventory,
         if it exists. Otherwise, states that the player does not have that
         item."""
-        item = checkForItem(selectedItem)
+        item = self.checkForItem(selectedItem)
         if item:
             return item["Description"]
         else:
@@ -151,7 +152,7 @@ def loadNPC():
     with open(npcFile) as file:
         npcData = json.load(file)
         loadedNPC.traits = npcData[0]
-        loadedNPC.preferences
+        loadedNPC.preferences = npcData[1]
 
 def loadPlayer():
     playerFile = "charFiles/charSave.json"
@@ -162,6 +163,15 @@ def loadPlayer():
         loadedPlayer.inventory.inventory = playerData["Inventory"]
         loadedPlayer.energy = playerData["Energy"]
     return loadedPlayer
+
+def savePlayer(player):
+    with open("charFiles/charSave.json", "w") as file:
+        playerData = {
+            "Traits": player.traits,
+            "Inventory": player.inventory.inventory,
+            "Energy": player.energy
+        }
+        json.dump(playerData, file)
         
 
 def displayOptions(**options):
@@ -174,25 +184,16 @@ def testBlock():
     with open(itemFile) as file:
         itemList = json.load(file)
     
-    mainCharacter = loadPlayer()
+    # mainCharacter = loadPlayer()
+    mainCharacter = getPlayerInfo()
+    savePlayer(mainCharacter)
 
-    '''
     for item in itemList:
         mainCharacter.inventory.addItem(item)
+
+    savePlayer(mainCharacter)
+        
     '''
-
-    testItem = "Masamune"
-    if mainCharacter.inventory.checkForItem(testItem):
-        print("You have that item")
-    else:
-        print("You don't have that item")
-
-    testItem = "Banana"
-    if mainCharacter.inventory.checkForItem(testItem):
-        print("You have that item")
-    else:
-        print("You don't have that item")
-
     with open("charFiles/charSave.json", "w") as file:
         playerData = {
             "Traits": mainCharacter.traits,
@@ -200,10 +201,8 @@ def testBlock():
             "Energy": mainCharacter.energy
         }
         json.dump(playerData, file)
-
-    
-   
     '''
+   
     mainCharacter.inventory.open()
     while(mainCharacter.inventory.isOpen()):
         try:
@@ -220,6 +219,5 @@ def testBlock():
                 print("That's not an option!")
         except ValueError:
              print("That's not an option!")
-     '''
 
 testBlock()
