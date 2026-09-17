@@ -29,6 +29,9 @@ class Inventory:
     def inventory(self):
         """Return the player's current inventory"""
         return self.__inventory
+    @inventory.setter
+    def inventory(self, loadedInv):
+        self.__inventory = loadedInv
     def isOpen(self):
         """Return whether or not the inventory is currently open"""
         return self.__invState
@@ -63,11 +66,12 @@ class Inventory:
         """Returns the description of a chosen item in the player's inventory,
         if it exists. Otherwise, states that the player does not have that
         item."""
-        '''
-        if self.__inventory.checkForItem(selectedItem):
+        item = checkForItem(selectedItem)
+        if item:
+            return item["Description"]
         else:
             return "You don't have that!"
-        '''
+        
 
 class Player(Character):
     """Child class of parent, represents the user's player
@@ -111,8 +115,8 @@ class NPC(Character):
             "Blood Type": ""
         }, 
         preferences = {
-            "likes": [], 
-            "dislikes": []
+            "Likes": [], 
+            "Dislikes": []
         }
     ):
         super().__init__(npcTraits)
@@ -120,10 +124,10 @@ class NPC(Character):
         self.attachment = 0
         
     def receiveGift(self, gift):
-        if gift["Name"] in self.preferences["likes"]:
+        if gift["Name"] in self.preferences["Likes"]:
             print(f"{self.name} likes your gift!")
             self.attachment += 10
-        elif gift["Name"] in self.preferences["dislikes"]:
+        elif gift["Name"] in self.preferences["Dislikes"]:
             print(f"{self.name} didn't like your gift...")
             self.attachment -= 10
         else:
@@ -141,7 +145,7 @@ def getPlayerInfo():
         confirm = input("is this okay?: ")
     return infoHold
 
-def loadNPCInfo():
+def loadNPC():
     npcFile = "charFiles/npcs.json"
     loadedNPC = NPC()
     with open(npcFile) as file:
@@ -149,9 +153,15 @@ def loadNPCInfo():
         loadedNPC.traits = npcData[0]
         loadedNPC.preferences
 
-def loadPlayerInfo():
+def loadPlayer():
     playerFile = "charFiles/charSave.json"
     loadedPlayer = Player()
+    with open(playerFile) as file:
+        playerData = json.load(file)
+        loadedPlayer.traits = playerData["Traits"]
+        loadedPlayer.inventory.inventory = playerData["Inventory"]
+        loadedPlayer.energy = playerData["Energy"]
+    return loadedPlayer
         
 
 def displayOptions(**options):
@@ -164,11 +174,14 @@ def testBlock():
     with open(itemFile) as file:
         itemList = json.load(file)
     
-    mainCharacter = getPlayerInfo()
+    mainCharacter = loadPlayer()
+
+    '''
     for item in itemList:
         mainCharacter.inventory.addItem(item)
+    '''
 
-    testItem = "Apple"
+    testItem = "Masamune"
     if mainCharacter.inventory.checkForItem(testItem):
         print("You have that item")
     else:
@@ -182,11 +195,13 @@ def testBlock():
 
     with open("charFiles/charSave.json", "w") as file:
         playerData = {
-            "traits": mainCharacter.traits,
-            "inventory": mainCharacter.inventory.inventory,
-            "energy": mainCharacter.energy
+            "Traits": mainCharacter.traits,
+            "Inventory": mainCharacter.inventory.inventory,
+            "Energy": mainCharacter.energy
         }
         json.dump(playerData, file)
+
+    
    
     '''
     mainCharacter.inventory.open()
