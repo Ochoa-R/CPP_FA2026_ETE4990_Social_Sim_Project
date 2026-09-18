@@ -3,19 +3,6 @@ import json
 now = datetime.now()
 id_list = []
 
-def startGame():
-    askUserAfterStart = input("New Game | Load Save | Achievements | Exit")
-    if askUserAfterStart == "New Game":
-        newGame()
-    elif askUserAfterStart == "Load Save":
-        loadSave()
-    elif askUserAfterStart == "Achievements":
-        openAchievementsMenu()
-    elif askUserAfterStart == "End Game":
-        exitGame()
-    else
-        print("Invalid Function")
-
 saves = {
     0: {
         "achievement1": {
@@ -29,12 +16,12 @@ saves = {
         }
     }
 }
-#achievement menu below
+
 achievementDict = {
     "achievement1": {
-        "haveAchievement": True, 
-        "timeComplete": "hello", 
-        "dateComplete": "your mom"},
+        "haveAchievement": False, 
+        "timeComplete": 0, 
+        "dateComplete": 0},
     "achievement2": {
         "haveAchievement": False, 
         "timeComplete": 0, 
@@ -42,6 +29,22 @@ achievementDict = {
     }
 }
 
+def startGame():
+    askUserAfterStart = input("New Game | Load Save | Achievements | Exit")
+    if askUserAfterStart == "New Game":
+        newGame()
+    elif askUserAfterStart == "Load Save":
+        loadSave()
+    elif askUserAfterStart == "Achievements":
+        openAchievementsMenu()
+    elif askUserAfterStart == "Exit":
+        exitGame()
+    else
+        print("Invalid Function")
+        startGame()
+startGame() 
+
+#achievement menu below
 def achievementGet(refAchiev):
     if achievementDict[refAchiev]["haveAchievement"] == True:
         return
@@ -50,13 +53,22 @@ def achievementGet(refAchiev):
         achievementDict[refAchiev]["timeComplete"] = f"{now.hour}:{now.minute}"
         achievementDict[refAchiev]["dateComplete"] = f"{now.month}/{now.day}/{now.year}"
 
+def fileExistsCheck():
+    #Checks for save file, if they don't have prevents a crash
+    filename = "saves_file"
+    try:
+        with open(filename, 'r'):
+            return True
+    except FileNotFoundError:
+        return False
+
+
 #Creating Saves
 def saveGame():
-    def saveGame():
     filename = "save"
     #Check if user has save file already
     if fileExistsCheck() == False:
-        #Creates new save file
+        #Creates new save file and gives the save an id
         id_list.append(0)
         with open(filename, 'w') as f:
             json.dump(saves, f)
