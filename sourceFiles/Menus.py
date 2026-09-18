@@ -39,10 +39,9 @@ def startGame():
         openAchievementsMenu()
     elif askUserAfterStart == "Exit":
         exitGame()
-    else
+    else:
         print("Invalid Function")
         startGame()
-startGame() 
 
 #achievement menu below
 def achievementGet(refAchiev):
@@ -65,7 +64,7 @@ def fileExistsCheck():
 
 #Creating Saves
 def saveGame():
-    filename = "save"
+    filename = "saves_file"
     #Check if user has save file already
     if fileExistsCheck() == False:
         #Creates new save file and gives the save an id
@@ -102,7 +101,7 @@ def loadSave():
         saves = json.load(f)
     print("Please choose which save you would like to load")
     #Shows the saves and allows the user to pick which one to overwrite their data with
-    for number in id_list
+    for number in id_list:
         print(id_list[number])
     loadSaveResponse = input()
     achievementDict = saves[loadSaveResponse]
@@ -126,9 +125,12 @@ def openAchievementsMenu():
             print(name, end="", flush = True)
             print(f" Completed on {time}, {date}")
     input("Type B to go back")
+    startGame()
     #I'm sure there will be a lot of clutter over time as the player progresses
     #I searched up a solution but from what I've seen it depends on where the file is ran
     #We should figure this out later
 
 def exitGame():
     print("exit works")
+
+startGame()
