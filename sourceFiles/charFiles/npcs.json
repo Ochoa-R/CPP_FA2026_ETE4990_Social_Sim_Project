@@ -1,0 +1,15 @@
+{
+	"Magus":	
+	[
+    		{
+        		"Name": "Magus",
+        		"Hair Color": "Silver",
+        		"Eye Color": "Red",
+        		"Blood Type": "???"
+    		},
+    		{
+        		"Likes": ["Apple"], 
+        		"Dislikes": ["Masamune"]
+    		}
+	]
+}
