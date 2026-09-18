@@ -36,18 +36,15 @@ class Inventory:
         """Return whether or not the inventory is currently open"""
         return self.__invState
     def open(self):
-        """Open the player's inventory. Used to support menu logic"""
+        """Open the player's inventory if any items are in it. Used to 
+        support menu logic"""
         if len(self.__inventory) == 0:
             print("Inventory empty!\n")
         else:
-            count = 1
-            for item in self.__inventory:
-                print(f"{count}) {self.readItemName(item)}")
-                count += 1
             self.__invState = True
     def close(self):
         """Close the player's inventory. Used to support menu logic"""
-        self.__invState = False 
+        self.__invState = False
     def checkForItem(self, name):
         """checks whether a given item exists in the player's current inventory.
         Used for error handling before returning or editing inventory values."""
@@ -72,6 +69,13 @@ class Inventory:
             return item["Description"]
         else:
             return "You don't have that!"
+    def readCurrentInventory(self):
+        """Prints the names of all items currently in inventory in a numbered
+        list"""
+        count = 1
+        for item in self.__inventory:
+            print(f"{count}) {self.readItemName(item)}")
+            count += 1
         
 
 class Player(Character):
@@ -95,6 +99,7 @@ class Player(Character):
         self.energy = energy
 
     def checkStats(self):
+        """Prints out the player's current stats"""
         for key, value in self.traits.items():
             print(f"{key}: {value}")
         print(f"Current energy: {self.energy}")
@@ -135,6 +140,8 @@ class NPC(Character):
             print(f"{self.name} appreciated the thought.")     
 
 def getPlayerInfo():
+    """Prompts the player for the required info to store into a Player object. 
+    Will loop until the player confirms their selection."""
     infoHold = Player()
     confirm = ""
     while confirm != "Yes" and confirm != "yes":
@@ -143,18 +150,22 @@ def getPlayerInfo():
             infoHold.traits[key] = attribute
         for key, value in infoHold.traits.items():
             print(f"Your {key} is: {value}")
-        confirm = input("is this okay?: ")
+        confirm = input("is this okay? (yes / no): ")
     return infoHold
 
-def loadNPC():
+def loadNPC(npcName):
+    """Loads the data for the specified NPC from the json."""
     npcFile = "charFiles/npcs.json"
     loadedNPC = NPC()
     with open(npcFile) as file:
         npcData = json.load(file)
-        loadedNPC.traits = npcData[0]
-        loadedNPC.preferences = npcData[1]
+        loadedNPC.traits = npcData[npcName][0]
+        loadedNPC.preferences = npcData[npcName][1]
+    print(f"{npcName} loaded!")
+    return loadedNPC
 
 def loadPlayer():
+    """Loads previously existing data for the player, if it exists."""
     playerFile = "charFiles/charSave.json"
     loadedPlayer = Player()
     with open(playerFile) as file:
@@ -165,6 +176,7 @@ def loadPlayer():
     return loadedPlayer
 
 def savePlayer(player):
+    """Creates a fresh save for the current player."""
     with open("charFiles/charSave.json", "w") as file:
         playerData = {
             "Traits": player.traits,
@@ -175,6 +187,7 @@ def savePlayer(player):
         
 
 def displayOptions(**options):
+    """Displays options for the menu that is passed in."""
     for optionNumber, optionDesc in options:
         print(f"{optionNumber}) {optionDesc["action"]}")
 
@@ -183,38 +196,51 @@ def testBlock():
     itemList = []
     with open(itemFile) as file:
         itemList = json.load(file)
-    
-    # mainCharacter = loadPlayer()
-    mainCharacter = getPlayerInfo()
+    try:
+        mainCharacter = loadPlayer()
+    except FileNotFoundError:
+        mainCharacter = getPlayerInfo()
+        for item in itemList:
+            mainCharacter.inventory.addItem(item)
     savePlayer(mainCharacter)
+    date = loadNPC("Magus")
+    print(f"{date.traits["Name"]} wants to hang out!")
 
-    for item in itemList:
-        mainCharacter.inventory.addItem(item)
-
-    savePlayer(mainCharacter)
-        
-    '''
-    with open("charFiles/charSave.json", "w") as file:
-        playerData = {
-            "Traits": mainCharacter.traits,
-            "Inventory": mainCharacter.inventory.inventory,
-            "Energy": mainCharacter.energy
-        }
-        json.dump(playerData, file)
-    '''
-   
-    mainCharacter.inventory.open()
-    while(mainCharacter.inventory.isOpen()):
+    while True:
         try:
-            action = int(input(
-                "What would you like to do?\n1) close\n2) read item description\n3) check stats\n(type the number of the action you want to perform):"))
+            print("What would you like to do?")
+            print(
+                " 1) leave\n",
+                "2) check stats\n",
+                "3) open inventory"
+            )
+            action = int(input("(type the number of the action you want to perform):"))
             if action == 1:
-                mainCharacter.inventory.close()
+                break
             elif action == 2:
-                selectedItem = input("Which item would you like to see the description of?\n(type the name of the item):")
-                print(mainCharacter.inventory.readItemDesc(selectedItem))
-            elif action == 3:
                 mainCharacter.checkStats()
+            elif action == 3:
+                mainCharacter.inventory.open()
+                while mainCharacter.inventory.isOpen():
+                    mainCharacter.inventory.readCurrentInventory()
+                    print("What would you like to do with your inventory?")
+                    print(
+                        " 1) close\n",
+                        "2) read item description"
+                    )
+                    try:
+                        menuAction = int(input("(type the number of the action you want to perform):"))
+                        if menuAction == 1:
+                            mainCharacter.inventory.close()
+                        elif menuAction == 2:
+                            print("What item would you like to see the description of?")
+                            print(mainCharacter.inventory.readItemDesc(
+                                input("(type the name of the item): ")
+                            ))
+                        else:
+                            print("That's not an option!")
+                    except ValueError:
+                        print("That's not an option!")               
             else:
                 print("That's not an option!")
         except ValueError:
