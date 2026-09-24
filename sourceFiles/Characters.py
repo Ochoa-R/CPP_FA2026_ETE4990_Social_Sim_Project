@@ -1,11 +1,5 @@
 # Social Sim Game Project
-# Antonio Ochoa, Joseph Endozo
-# for json: item template
-# {
-#   "Name": "",
-#   "Description": ""
-# }
-import json
+# Antonio Ochoa's Code
 
 class Character:
     """Parent class designed to hold the traits of a character
