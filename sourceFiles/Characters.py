@@ -1,5 +1,6 @@
 # Social Sim Game Project
 # Antonio Ochoa's Code
+import json
 
 class Character:
     """Parent class designed to hold the traits of a character
